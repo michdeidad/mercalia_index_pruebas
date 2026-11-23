@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MERCALIA · Guía Interactiva de Sustentación DDL (v2 Corregida)</title>
+<style>
+  :root {
+    --bg-main: #090d16;
+    --bg-surface: #111827;
+    --bg-card: #161f33;
+    --bg-card-hover: #1d2842;
+    --border-subtle: rgba(148, 163, 184, 0.14);
+    --border-active: rgba(56, 189, 248, 0.45);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-cyan: #38bdf8;
+    --accent-indigo: #818cf8;
+    --accent-emerald: #34d399;
+    --accent-amber: #fbbf24;
+    --accent-rose: #fb7185;
+    --accent-purple: #c084fc;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Layout */
+  .app-shell { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-subtle);
+    position: fixed;
+    top: 0; bottom: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 40;
+    transition: transform 0.3s ease;
+  }
+  .sidebar-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    margin-bottom: 0.5rem;
+  }
+  .sidebar-title { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+  .sidebar-sub { font-size: 0.78rem; color: var(--text-secondary); }
+
+  .progress-box {
+    padding: 0.9rem 1.25rem;
+    background: rgba(15, 23, 42, 0.6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .progress-row { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.4rem; }
+  .progress-track {
+    height: 7px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+    transition: width 0.35s ease;
+  }
+
+  .nav-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+  .nav-group-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.6rem 0.6rem 0.25rem;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.83rem;
+    transition: all 0.15s ease;
+    margin-bottom: 0.15rem;
+  }
+  .nav-link:hover { background: var(--bg-card); color: var(--text-primary); }
+  .nav-link.active { background: rgba(56, 189, 248, 0.12); color: var(--accent-cyan); font-weight: 600; }
+  .nav-pill {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    background: #1e293b;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    color: var(--text-secondary);
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 1.5rem 2rem 4rem;
+    max-width: 1280px;
+  }
+
+  /* Top Mobile Header */
+  .mobile-bar {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 35;
+    background: rgba(17, 24, 39, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.75rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .btn-icon {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* Hero & Controls */
+  .hero {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.09), rgba(129, 140, 248, 0.08));
+    border: 1px solid var(--border-subtle);
+    border-radius: 1rem;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .hero p { color: var(--text-secondary); font-size: 0.94rem; max-width: 820px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .stat-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+  }
+  .stat-val { font-size: 1.35rem; font-weight: 800; color: var(--accent-cyan); font-family: var(--font-mono); }
+  .stat-lbl { font-size: 0.75rem; color: var(--text-secondary); }
+
+  /* Filter Toolbar */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    background: rgba(9, 13, 22, 0.92);
+    backdrop-filter: blur(10px);
+    padding: 0.85rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 230px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 0.6rem 0.95rem;
+    border-radius: 0.6rem;
+    font-size: 0.88rem;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent-cyan); }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    padding: 0.42rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .chip:hover { border-color: var(--accent-cyan); color: var(--text-primary); }
+  .chip.active { background: var(--accent-cyan); color: #090d16; border-color: var(--accent-cyan); }
+
+  /* Section Headings */
+  .section-header {
+    margin: 2.25rem 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .section-title { font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.55rem; }
+  .section-desc { font-size: 0.84rem; color: var(--text-secondary); width: 100%; }
+
+  /* Entity Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.15rem;
+  }
+  .entity-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.9rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    transition: transform 0.18s ease, border-color 0.18s ease;
+  }
+  .entity-card:hover { border-color: var(--border-active); transform: translateY(-2px); }
+  .entity-card.mastered { border-color: rgba(52, 211, 153, 0.45); background: linear-gradient(180deg, rgba(52, 211, 153, 0.04), var(--bg-card)); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+  .entity-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.35rem;
+    font-weight: 700;
+  }
+  .entity-type {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+  }
+  .type-main { background: rgba(129, 140, 248, 0.15); color: var(--accent-indigo); }
+  .type-assoc { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); }
+
+  .entity-name {
+    font-family: var(--font-mono);
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 0.3rem;
+  }
+  .entity-purpose { font-size: 0.86rem; color: var(--text-secondary); }
+
+  .keys-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .key-tag {
+    font-family: var(--font-mono);
+    font-size: 0.71rem;
+    padding: 0.18rem 0.48rem;
+    border-radius: 0.35rem;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--border-subtle);
+  }
+  .key-pk { color: var(--accent-amber); border-color: rgba(251, 191, 36, 0.3); }
+  .key-fk { color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.3); }
+  .key-uq { color: var(--accent-purple); border-color: rgba(192, 132, 252, 0.3); }
+
+  .constraints-list {
+    background: rgba(9, 13, 22, 0.6);
+    border-radius: 0.6rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid rgba(148, 163, 184, 0.08);
+  }
+  .constraints-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-emerald);
+    margin-bottom: 0.35rem;
+  }
+  .constraints-list ul { padding-left: 1rem; font-size: 0.8rem; color: var(--text-secondary); }
+  .constraints-list li { margin-bottom: 0.25rem; }
+  .constraints-list code {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: #e2e8f0;
+    background: rgba(30, 41, 59, 0.85);
+    padding: 0.05rem 0.3rem;
+    border-radius: 0.25rem;
+  }
+
+  /* Flashcard Q&A */
+  .qa-box {
+    border-top: 1px dashed var(--border-subtle);
+    padding-top: 0.75rem;
+    margin-top: auto;
+  }
+  .qa-question {
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: #fde68a;
+    margin-bottom: 0.5rem;
+  }
+  .qa-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .btn-reveal {
+    flex: 1;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: var(--accent-cyan);
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-reveal:hover { background: rgba(56, 189, 248, 0.22); }
+  .btn-check {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    color: var(--accent-emerald);
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-check.done { background: var(--accent-emerald); color: #090d16; }
+
+  .qa-answer {
+    display: none;
+    margin-top: 0.65rem;
+    background: rgba(16, 185, 129, 0.08);
+    border-left: 3px solid var(--accent-emerald);
+    padding: 0.65rem 0.8rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-size: 0.82rem;
+    color: #e2e8f0;
+  }
+  .qa-answer.open { display: block; animation: fadeIn 0.2s ease; }
+
+  /* Simple SQL Lab Section */
+  .sql-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.95rem;
+    padding: 1.35rem;
+    margin-bottom: 1.25rem;
+  }
+  .sql-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .sql-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--accent-amber);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+  }
+  .sql-title { font-size: 1.05rem; font-weight: 700; margin-top: 0.25rem; }
+  .sql-goal { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.85rem; }
+
+  .code-block-wrap {
+    position: relative;
+    background: #060911;
+    border: 1px solid #1e293b;
+    border-radius: 0.65rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .code-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.85rem;
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+  }
+  .btn-copy {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--accent-cyan);
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  pre {
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.81rem;
+    line-height: 1.55;
+    color: #e2e8f0;
+  }
+  .kw { color: #38bdf8; font-weight: 700; }
+  .fn { color: #c084fc; }
+  .str { color: #34d399; }
+  .num { color: #fbbf24; }
+  .cmt { color: #64748b; font-style: italic; }
+
+  /* Anatomy & Workflow Step-by-Step */
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .breakdown-panel {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.7rem;
+    padding: 0.9rem 1rem;
+  }
+  .panel-heading {
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.55rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .clause-item {
+    font-size: 0.82rem;
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  }
+  .clause-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .clause-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.12);
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.3rem;
+    margin-right: 0.35rem;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    background: rgba(9, 13, 22, 0.65);
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid var(--accent-indigo);
+  }
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 800;
+    background: var(--accent-indigo);
+    color: #090d16;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+  }
+
+  /* Result Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.6rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    text-align: left;
+  }
+  th {
+    background: #0f172a;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    color: #cbd5e1;
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Triggers & Notes */
+  .trigger-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.9rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .alert-note {
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 0.75rem;
+    padding: 1rem 1.15rem;
+    font-size: 0.85rem;
+    color: #fef3c7;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 1rem 1rem 3rem; }
+    .mobile-bar { display: flex; }
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-bar">
+  <button class="btn-icon" onclick="toggleSidebar()">☰ Módulos (33)</button>
+  <span style="font-weight:800; font-size:0.92rem; color:var(--accent-cyan);">MERCALIA DDL v2</span>
+  <span id="mobile-prog" style="font-family:var(--font-mono); font-size:0.8rem; color:var(--accent-emerald);">0/33</span>
+</div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-badge">PostgreSQL 15+ · Script v2</div>
+      <div class="sidebar-title">MERCALIA · Sustentación</div>
+      <div class="sidebar-sub">Guía maestra de 33 entidades y SQL</div>
+    </div>
+
+    <div class="progress-box">
+      <div class="progress-row">
+        <span style="color:var(--text-secondary);">Tarjetas dominadas</span>
+        <span id="prog-text" style="font-family:var(--font-mono); font-weight:700; color:var(--accent-emerald);">0 / 33 (0%)</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="prog-bar"></div>
+      </div>
+    </div>
+
+    <nav class="nav-scroll">
+      <div class="nav-group-label">Módulos de Entidades (33)</div>
+      <a href="#mod-1" class="nav-link" onclick="closeSidebarMobile()"><span>1. Usuarios y Seguridad</span><span class="nav-pill">6</span></a>
+      <a href="#mod-2" class="nav-link" onclick="closeSidebarMobile()"><span>2. Comercios y Catálogo</span><span class="nav-pill">13</span></a>
+      <a href="#mod-3" class="nav-link" onclick="closeSidebarMobile()"><span>3. Cupones y Pedidos</span><span class="nav-pill">5</span></a>
+      <a href="#mod-4" class="nav-link" onclick="closeSidebarMobile()"><span>4. Módulo Financiero</span><span class="nav-pill">2</span></a>
+      <a href="#mod-5" class="nav-link" onclick="closeSidebarMobile()"><span>5. Soporte y Sistema</span><span class="nav-pill">7</span></a>
+
+      <div class="nav-group-label">Práctica de Sustentación</div>
+      <a href="#sec-consultas" class="nav-link" onclick="closeSidebarMobile()"><span>Consultas SQL Explicadas</span><span class="nav-pill" style="color:var(--accent-amber);">8</span></a>
+      <a href="#sec-triggers" class="nav-link" onclick="closeSidebarMobile()"><span>Triggers y Reglas DDL</span><span class="nav-pill" style="color:var(--accent-purple);">2</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <section class="hero">
+      <h1>Banco de Estudio · Base de Datos MERCALIA (Script Corregido)</h1>
+      <p>
+        Todo el modelo lógico de <strong>33 tablas</strong> (27 principales y 6 asociativas de llave primaria compuesta), analizado entidad por entidad con sus restricciones <code>CHECK</code>, llaves <code>PK/FK/UNIQUE</code>, notas del diseño DDL y un laboratorio de <strong>consultas SQL sencillas explicadas cláusula por cláusula y paso a paso</strong>.
+      </p>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val">33</div><div class="stat-lbl">Tablas Totales (27 + 6)</div></div>
+        <div class="stat-card"><div class="stat-val">PG 15+</div><div class="stat-lbl">UNIQUE NULLS NOT DISTINCT</div></div>
+        <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Consultas con Flujo Paso a Paso</div></div>
+        <div class="stat-card"><div class="stat-val">2</div><div class="stat-lbl">Funciones &amp; Triggers Activos</div></div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar tabla, constraint, columna o pregunta (ej: usuario, ck_cupon, FK compuesta)..." oninput="filterCards()">
+      <div class="chip-group">
+        <button class="chip active" data-filter="all" onclick="setFilter('all', this)">Todas (33)</button>
+        <button class="chip" data-filter="main" onclick="setFilter('main', this)">Principales (27)</button>
+        <button class="chip" data-filter="assoc" onclick="setFilter('assoc', this)">Asociativas N:M (6)</button>
+        <button class="chip" data-filter="pending" onclick="setFilter('pending', this)">Por repasar</button>
+      </div>
+    </div>
+
+    <!-- CONTAINER FOR 33 ENTITY MODULES -->
+    <div id="modules-container"></div>
+
+    <!-- SECTION: SIMPLE SQL QUERIES WITH SENTENCE & WORKFLOW EXPLANATION -->
+    <section id="sec-consultas">
+      <div class="section-header">
+        <h2 class="section-title">🔎 Laboratorio de Consultas SQL Sencillas (Paso a Paso)</h2>
+        <p class="section-desc">
+          Consultas claras y directas usando los atributos reales del DDL con datos simulados. Cada consulta explica <strong>qué hace cada sentencia SQL</strong> y <strong>en qué orden lógico la ejecuta PostgreSQL</strong>.
+        </p>
+      </div>
+
+      <div id="queries-container"></div>
+    </section>
+
+    <!-- SECTION: TRIGGERS & DDL ARCHITECTURE -->
+    <section id="sec-triggers">
+      <div class="section-header">
+        <h2 class="section-title">⚡ Triggers, Funciones y Decisiones Clave del DDL</h2>
+        <p class="section-desc">
+          Puntos exactos que explican cómo se automatizan las reglas entre varias tablas y qué decisiones de integridad protegen la base de datos.
+        </p>
+      </div>
+
+      <div class="alert-note">
+        <strong>💡 Detalle técnico importante en el script v2 (para tener en el radar):</strong>
+        En la tabla <code>usuario</code>, la línea del constraint <code>ck_usuario_correo</code> tiene un paréntesis sin cerrar al final antes de la coma (<code>... \.[a-z]{2,}$',</code>). Si un jurado o evaluador corre el script tal cual en PostgreSQL, solo basta cerrar ese paréntesis (<code>... \.[a-z]{2,}$'),</code>). Además, en <code>chat</code> se omitieron las FK explícitas hacia <code>usuario</code> y <code>comercio</code> dejando solo la restricción <code>UNIQUE NULLS NOT DISTINCT</code>.
+      </div>
+
+      <div class="trigger-box">
+        <h3 style="color:var(--accent-cyan); font-size:1.05rem; margin-bottom:0.4rem;">1. ¿Por qué los DROP TABLE al inicio NO usan CASCADE?</h3>
+        <p style="font-size:0.86rem; color:var(--text-secondary);">
+          El script borra las tablas en orden inverso (de las más dependientes como <code>verificacion_documento</code> hasta las catálogos base como <code>rol</code>) sin usar <code>DROP TABLE ... CASCADE</code>. ¿Por qué? Porque <code>CASCADE</code> destruiría silenciosamente llaves foráneas en otras tablas si el orden estuviera mal, ocultando errores de dependencia y rompiendo la integridad referencial del modelo.
+        </p>
+      </div>
+
+      <div class="trigger-box">
+        <h3 style="color:var(--accent-cyan); font-size:1.05rem; margin-bottom:0.4rem;">2. Trigger <code>trg_usuario_normalizar_correo</code> → <code>fn_normalizar_correo_usuario()</code></h3>
+        <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:0.5rem;">
+          Se dispara <strong>BEFORE INSERT OR UPDATE OF correo ON usuario</strong>:
+        </p>
+        <ul style="padding-left:1.2rem; font-size:0.84rem; color:var(--text-secondary);">
+          <li>Convierte automáticamente el correo a minúsculas y quita espacios externos (<code>lower(btrim(NEW.correo))</code>) antes de que el <code>CHECK</code> lo evalúe.</li>
+          <li>Si es un <code>UPDATE</code> y el correo cambió (<code>NEW.correo IS DISTINCT FROM OLD.correo</code>), reinicia <code>correo_verificado := FALSE</code> para obligar a validar el nuevo correo.</li>
+        </ul>
+      </div>
+
+      <div class="trigger-box">
+        <h3 style="color:var(--accent-cyan); font-size:1.05rem; margin-bottom:0.4rem;">3. Trigger <code>trg_verificacion_activar_comerciante</code> → <code>fn_activar_comerciante()</code></h3>
+        <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:0.5rem;">
+          Se dispara <strong>AFTER INSERT ON verificacion_documento</strong> y resuelve una regla multi-tabla que un <code>CHECK</code> no puede hacer:
+        </p>
+        <ul style="padding-left:1.2rem; font-size:0.84rem; color:var(--text-secondary);">
+          <li><strong>Bloqueo de concurrencia (<code>FOR UPDATE</code>):</strong> Bloquea la fila del comercio en estado <code>PENDIENTE_VERIFICACION</code> para evitar que dos aprobaciones simultáneas se pisen.</li>
+          <li><strong>Lista dinámica de documentos (<code>TEXT[]</code> + <code>unnest</code>):</strong> Exige los 4 documentos base de persona (<code>CEDULA_FRENTE</code>, <code>CEDULA_REVERSO</code>, <code>SELFIE_CEDULA</code>, <code>CUENTA_COBRO</code>) y suma requisitos según el perfil: <code>EVIDENCIA_ACTIVIDAD</code> si es emprendedor, <code>FACHADA</code> si tiene local físico, <code>RUT</code> si es formal, y <code>CAMARA_COMERCIO</code> + <code>CEDULA_REP_LEGAL</code> si es persona jurídica.</li>
+          <li><strong>Activación en cadena:</strong> Si <code>v_faltan = 0</code> y el comercio tiene al menos una categoría activa en <code>categoria_comercio</code>, actualiza <code>comercio.estado = 'ACTIVO'</code> y también activa el rol comerciante en <code>usuario_rol</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const MODULES = [
+  {
+    id: "mod-1",
+    title: "Módulo 1 · Usuarios, Roles y Seguridad",
+    desc: "Gestión de identidad, control de acceso N:M, verificación OTP, direcciones georreferenciadas y notificaciones push.",
+    entities: [
+      {
+        num: 1, name: "rol", type: "main",
+        purpose: "Catálogo maestro de perfiles del sistema (CLIENTE, COMERCIANTE, ADMINISTRADOR). Permite normalizar la relación N:M con usuario.",
+        keys: ["PK: rol_id (IDENTITY)", "UQ: nombre"],
+        constraints: [
+          "<code>ck_rol_nombre</code>: Restringe el dominio estrictamente a <code>'CLIENTE'</code>, <code>'COMERCIANTE'</code> o <code>'ADMINISTRADOR'</code>.",
+          "<code>uq_rol_nombre</code>: Crea un índice único para evitar roles duplicados y acelerar búsquedas por nombre."
+        ],
+        q: "¿Por qué crear una tabla 'rol' si solo hay 3 roles fijos?",
+        a: "Porque un mismo usuario en MERCALIA puede ser cliente y comerciante a la vez (relación N:M). Normalizar 'rol' evita repetir texto, garantiza integridad referencial y permite asignar estados independientes por rol en 'usuario_rol'."
+      },
+      {
+        num: 2, name: "usuario", type: "main",
+        purpose: "Entidad central de personas registradas. Almacena credenciales seguras, consentimiento legal (IP y versión de términos), reputación y doble factor 2FA.",
+        keys: ["PK: usuario_id", "UQ: correo"],
+        constraints: [
+          "<code>chk_telefono</code>: Exige celular colombiano de 10 dígitos empezando por 3 (<code>^3[0-9]{9}$</code>) para garantizar recepción de OTP y WhatsApp.",
+          "<code>ck_usuario_correo</code>: Exige minúsculas y formato válido de email.",
+          "<code>ck_usuario_puntuacion</code>: Puntuación entre 0 y 5; si <code>total_calificaciones = 0</code>, el promedio debe ser 0.",
+          "<code>ck_usuario_totp</code>: Impide activar 2FA (<code>totp_activo = TRUE</code>) si <code>totp_secreto</code> es NULL.",
+          "<code>ck_usuario_estado</code>: Solo permite <code>PENDIENTE</code>, <code>ACTIVO</code>, <code>SUSPENDIDO</code> o <code>INHABILITADO</code>."
+        ],
+        q: "¿Por qué 'telefono' es VARCHAR(13) y 'password_hash' es VARCHAR(255)?",
+        a: "El teléfono es un identificador informativo sin operaciones matemáticas y requiere validación de patrón móvil; password_hash necesita hasta 255 caracteres para que algoritmos como bcrypt o Argon2 no se trunquen."
+      },
+      {
+        num: 3, name: "usuario_rol", type: "assoc",
+        purpose: "Tabla asociativa (N:M) entre usuario y rol. Permite que una persona tenga múltiples roles con estados independientes (ej. cliente ACTIVO y comerciante EN_REVISION).",
+        keys: ["PK Compuesta: (usuario_id, rol_id)", "FK: usuario_id → usuario", "FK: rol_id → rol (ON DELETE RESTRICT)"],
+        constraints: [
+          "<code>ck_usuario_rol_estado</code>: Controla el ciclo de aprobación del rol (<code>PENDIENTE</code>, <code>EN_REVISION</code>, <code>ACTIVO</code>, <code>RECHAZADO</code>, <code>SUSPENDIDO</code>).",
+          "<code>ON DELETE RESTRICT</code> en <code>rol_id</code>: Impide eliminar un rol si existen usuarios asociados a él."
+        ],
+        q: "¿Qué ventaja da tener 'estado' en 'usuario_rol' y también en 'usuario'?",
+        a: "Separa el estado general de la cuenta (si puede iniciar sesión) del permiso específico de cada rol: si le rechazan o suspenden su perfil de comerciante, sigue pudiendo comprar como cliente."
+      },
+      {
+        num: 4, name: "codigo_verificacion", type: "main",
+        purpose: "Gestiona códigos temporales (OTP) hasheados para validar cuenta, recuperar contraseña o cambiar correo, con límite de intentos contra fuerza bruta.",
+        keys: ["PK: cod_id", "FK: usuario_id → usuario (ON DELETE CASCADE)", "INDEX: (usuario_id, tipo_proceso)"],
+        constraints: [
+          "<code>ck_cod_v_tipo</code>: Solo acepta <code>VERIFICACION_CUENTA</code>, <code>RECUPERACION_PASSWORD</code> o <code>CAMBIO_CORREO</code>.",
+          "<code>ck_codigo_verificacion_intentos</code>: Bloquea el código al llegar a 5 intentos fallidos (<code>BETWEEN 0 AND 5</code>).",
+          "<code>ON DELETE CASCADE</code>: Si se elimina el usuario, se limpian automáticamente sus códigos pendientes."
+        ],
+        q: "¿Por qué se guarda 'cod_hash' y no el código OTP en texto plano?",
+        a: "Por seguridad: si alguien accede a la base de datos o a un backup, no puede leer ni usar códigos activos de recuperación de contraseña."
+      },
+      {
+        num: 5, name: "direccion", type: "main",
+        purpose: "Almacena direcciones de entrega de clientes y ubicaciones físicas de comercios con coordenadas GPS (latitud y longitud).",
+        keys: ["PK: direccion_id", "FK: usuario_id → usuario"],
+        constraints: [
+          "<code>ck_direccion_texto</code>: Impide guardar direcciones o barrios vacíos o compuestos solo de espacios (<code>btrim(...) <> ''</code>).",
+          "<code>ck_direccion_latitud</code> y <code>longitud</code>: Valida coordenadas geográficas reales (latitud -90 a 90, longitud -180 a 180)."
+        ],
+        q: "¿Por qué 'latitud' y 'longitud' usan NUMERIC(10,8)?",
+        a: "Porque NUMERIC ofrece precisión exacta sin errores de redondeo binario de FLOAT, y 8 decimales permiten ubicar un punto con precisión sub-métrica en mapas."
+      },
+      {
+        num: 6, name: "dispositivo_push", type: "main",
+        purpose: "Registra los tokens de dispositivos (Web o Android) de cada usuario para enviar notificaciones push en tiempo real.",
+        keys: ["PK: dispositivo_id", "UQ: token_push", "FK: usuario_id → usuario (ON DELETE CASCADE)"],
+        constraints: [
+          "<code>ck_dispositivo_push_plataforma</code>: Solo permite <code>WEB</code> o <code>ANDROID</code>.",
+          "<code>ck_dispositivo_push_claves</code>: Si la plataforma es <code>WEB</code>, exige obligatoriamente las llaves criptográficas WebPush (<code>claves_push IS NOT NULL</code>).",
+          "<code>ck_dispositivo_push_fechas</code>: Garantiza que <code>fecha_ultimo_uso >= fecha_registro</code>."
+        ],
+        q: "¿Por qué 'claves_push' es obligatorio solo cuando plataforma = 'WEB'?",
+        a: "Porque el estándar Web Push de navegadores requiere claves de cifrado (p256dh y auth) del cliente, mientras que Firebase Cloud Messaging en Android solo necesita el token."
+      }
+    ]
+  },
+  {
+    id: "mod-2",
+    title: "Módulo 2 · Comercios, Documentación y Catálogo",
+    desc: "Tiendas, horarios, verificación documental KYC, jerarquía de categorías, productos, variantes, multimedia, favoritos y carrito.",
+    entities: [
+      {
+        num: 7, name: "categoria_comercial", type: "main",
+        purpose: "Catálogo maestro de giros o rubros comerciales (ej. Restaurante, Droguería, Ropa) que clasifican a los comercios.",
+        keys: ["PK: categoria_comercial_id", "UQ: nombre"],
+        constraints: [
+          "<code>uq_categoria_comercial_nombre</code>: Evita rubros comerciales repetidos.",
+          "<code>ck_categoria_comercial_nombre</code>: Prohíbe nombres en blanco."
+        ],
+        q: "¿Qué diferencia hay entre 'categoria_comercial' y 'categoria_producto'?",
+        a: "'categoria_comercial' clasifica al negocio completo (ej. Supermercado), mientras que 'categoria_producto' organiza los artículos individuales dentro del catálogo (ej. Lácteos -> Yogures)."
+      },
+      {
+        num: 8, name: "categoria_producto", type: "main",
+        purpose: "Árbol jerárquico recursivo (auto-referenciado) para categorías y subcategorías de productos.",
+        keys: ["PK: categoria_producto_id", "FK Recursiva: categoria_padre_id → categoria_producto", "UQ NULLS NOT DISTINCT: (categoria_padre_id, nombre)"],
+        constraints: [
+          "<code>ck_categoria_producto_padre</code>: Evita ciclos directos impidiendo que una categoría sea padre de sí misma (<code>categoria_padre_id <> categoria_producto_id</code>).",
+          "<code>UNIQUE NULLS NOT DISTINCT</code> (PG 15+): Impide crear dos categorías raíz con el mismo nombre cuando <code>categoria_padre_id</code> es NULL."
+        ],
+        q: "¿Para qué sirve 'UNIQUE NULLS NOT DISTINCT' en PostgreSQL 15+?",
+        a: "En SQL estándar dos NULL se consideran distintos, lo que permitiría duplicar categorías raíz con el mismo nombre. Con NULLS NOT DISTINCT, PostgreSQL trata los NULL como iguales y bloquea el duplicado."
+      },
+      {
+        num: 9, name: "comercio", type: "main",
+        purpose: "Representa cada tienda o emprendimiento registrado por un usuario con rol COMERCIANTE, incluyendo reglas legales, cobertura y cuenta bancaria.",
+        keys: ["PK: comercio_id", "UQ: slug", "FK Compuesta: (usuario_id, rol_id) → usuario_rol", "FK: direccion_id → direccion"],
+        constraints: [
+          "<code>fk_comercio_usuario_rol</code>: Garantiza que solo alguien con el rol asignado en <code>usuario_rol</code> pueda abrir un comercio.",
+          "<code>ck_comercio_local</code>: Bicondicional (<code>(modalidad = 'LOCAL_FISICO') = (direccion_id IS NOT NULL)</code>): local físico exige dirección; emprendedor no.",
+          "<code>ck_comercio_formal</code> y <code>juridica</code>: Si es formal exige NIT; si es persona jurídica exige ser formal y tener razón social.",
+          "<code>ck_comercio_pagos</code>: Obliga a aceptar al menos transferencia o efectivo.",
+          "<code>ck_comercio_radio</code>: Solo permite definir radio en km si <code>ofrece_domicilio = TRUE</code>."
+        ],
+        q: "¿Cómo asegura la base de datos que un comercio 'LOCAL_FISICO' siempre tenga dirección?",
+        a: "Mediante la igualdad booleana en el CHECK 'ck_comercio_local': (modalidad = 'LOCAL_FISICO') = (direccion_id IS NOT NULL). Ambos lados deben ser TRUE o ambos FALSE."
+      },
+      {
+        num: 10, name: "horario_comercio", type: "main",
+        purpose: "Define las franjas horarias de atención por día de la semana (1 a 7) para cada comercio, soportando turnos partidos en un mismo día.",
+        keys: ["PK Compuesta: (comercio_id, dia_semana, hora_apertura)", "FK: comercio_id → comercio (ON DELETE CASCADE)"],
+        constraints: [
+          "<code>ck_horario_comercio_dia</code>: Valida días del 1 al 7.",
+          "<code>ck_horario_comercio_horas</code>: Exige que <code>hora_cierre > hora_apertura</code>.",
+          "Incluir <code>hora_apertura</code> en la PK permite dos franjas el mismo día (ej. 8:00-12:00 y 14:00-18:00)."
+        ],
+        q: "¿Por qué 'hora_apertura' forma parte de la llave primaria de 'horario_comercio'?",
+        a: "Porque si la PK fuera solo (comercio_id, dia_semana), un restaurante no podría registrar turno de almuerzo y turno de cena el mismo día."
+      },
+      {
+        num: 11, name: "categoria_comercio", type: "assoc",
+        purpose: "Tabla asociativa N:M que vincula uno o varios rubros comerciales a un comercio. Es requisito obligatorio para que el trigger active el comercio.",
+        keys: ["PK Compuesta: (comercio_id, categoria_comercial_id)", "FK: comercio_id → comercio (CASCADE)", "FK: categoria_comercial_id → categoria_comercial"],
+        constraints: [
+          "Evita duplicar la misma categoría en un mismo comercio mediante la PK compuesta."
+        ],
+        q: "¿Qué papel juega esta tabla en la activación automática de un comercio?",
+        a: "El trigger 'fn_activar_comerciante' verifica con EXISTS que el comercio tenga al menos una fila aquí apuntando a una categoría activa antes de cambiar su estado a ACTIVO."
+      },
+      {
+        num: 12, name: "documentacion", type: "main",
+        purpose: "Almacena los documentos legales y de identidad cargados por el usuario o para un comercio específico (cédula, selfie, fachada, RUT, cámara de comercio).",
+        keys: ["PK: documentacion_id", "FK: usuario_id → usuario", "FK: comercio_id → comercio"],
+        constraints: [
+          "<code>ck_documentacion_tipo</code>: Restringe los 9 tipos de documentos válidos del flujo KYC.",
+          "<code>ck_documentacion_comercio</code>: Los 4 documentos personales permiten <code>comercio_id IS NULL</code>; los del negocio exigen <code>comercio_id IS NOT NULL</code>."
+        ],
+        q: "¿Por qué 'documentacion' no tiene una columna 'estado' (PENDIENTE/APROBADO)?",
+        a: "Para evitar redundancia e inconsistencias: el estado se deduce de 'verificacion_documento'. Si no existe fila allí, el documento está PENDIENTE; si existe, su resultado es APROBADO o RECHAZADO."
+      },
+      {
+        num: 13, name: "verificacion_documento", type: "main",
+        purpose: "Registra el dictamen (automático o manual) sobre cada documento cargado y dispara el trigger de activación del comerciante.",
+        keys: ["PK: verificacion_doc_id", "UQ: documentacion_id", "FK: documentacion_id → documentacion"],
+        constraints: [
+          "<code>uq_verificacion_documento_documentacion</code>: Garantiza relación 1:1 (un documento solo tiene un dictamen).",
+          "<code>ck_verificacion_documento_motivo</code>: Si el resultado es <code>RECHAZADO</code>, obliga a escribir observaciones explicando el motivo."
+        ],
+        q: "¿Qué ocurre en la base de datos en el instante en que se inserta un 'APROBADO' aquí?",
+        a: "Se ejecuta el trigger AFTER INSERT 'trg_verificacion_activar_comerciante', que revisa si ya están aprobados todos los documentos exigidos y si tiene categoría activa para activar el comercio y su rol."
+      },
+      {
+        num: 14, name: "producto", type: "main",
+        purpose: "Catálogo base de artículos ofrecidos por cada comercio, con estado de publicación, vistas y marcas de tiempo de auditoría.",
+        keys: ["PK: producto_id", "FK: comercio_id → comercio", "FK: categoria_producto_id → categoria_producto"],
+        constraints: [
+          "<code>ck_producto_estado</code>: Controla el ciclo de vida (<code>BORRADOR</code>, <code>ACTIVO</code>, <code>INACTIVO</code>, <code>ELIMINADO</code>) permitiendo borrado lógico.",
+          "<code>ck_producto_vistas</code>: Impide contadores negativos."
+        ],
+        q: "¿Por qué 'producto' no tiene columna 'precio' ni 'stock'?",
+        a: "Porque un producto puede tener presentaciones distintas (tallas, sabores, tamaños). Por eso el precio, el SKU y el inventario viven en 'variante_producto'."
+      },
+      {
+        num: 15, name: "variante_producto", type: "main",
+        purpose: "Unidad vendible real (SKU) de un producto, con precio propio, inventario disponible e inventario reservado para pedidos en curso.",
+        keys: ["PK: variante_id", "UQ: sku", "UQ: (producto_id, nombre_variante)", "FK: producto_id → producto"],
+        constraints: [
+          "<code>ck_variante_producto_precio</code>: Exige <code>precio > 0</code>.",
+          "<code>ck_variante_producto_stock</code>: Garantiza <code>stock_disponible >= 0</code>, <code>stock_reservado >= 0</code> y que nunca se reserve más de lo disponible (<code>stock_reservado <= stock_disponible</code>)."
+        ],
+        q: "¿Para qué sirven dos columnas de stock ('stock_disponible' y 'stock_reservado')?",
+        a: "Evita sobreventas: cuando un cliente crea un pedido, las unidades pasan a 'stock_reservado' sin descontarse aún del inventario físico hasta que el pago sea confirmado."
+      },
+      {
+        num: 16, name: "media_producto", type: "main",
+        purpose: "Galería multimedia (imágenes y videos) ordenada por producto, con restricción diferible para reordenar posiciones sin colisiones.",
+        keys: ["PK: media_id", "UQ DEFERRABLE: (producto_id, orden)", "FK: producto_id → producto"],
+        constraints: [
+          "<code>DEFERRABLE INITIALLY DEFERRED</code>: Permite intercambiar el orden de dos fotos dentro de una misma transacción validando la unicidad al hacer COMMIT.",
+          "<code>ck_media_producto_principal</code>: Impide marcar un <code>VIDEO</code> como portada principal (<code>NOT es_principal OR tipo = 'IMAGEN'</code>)."
+        ],
+        q: "¿Por qué la restricción de orden en 'media_producto' es DEFERRABLE INITIALLY DEFERRED?",
+        a: "Porque si quieres pasar la foto 1 al puesto 2 y la 2 al puesto 1 en una transacción, temporalmente habrá dos filas con orden 2. Al ser DEFERRED, PostgreSQL valida la unicidad al final de la transacción (COMMIT)."
+      },
+      {
+        num: 17, name: "favorito_comercio", type: "assoc",
+        purpose: "Tabla asociativa N:M que guarda los comercios marcados como favoritos por cada usuario.",
+        keys: ["PK Compuesta: (usuario_id, comercio_id)", "FK: usuario_id → usuario (CASCADE)", "FK: comercio_id → comercio (CASCADE)"],
+        constraints: [
+          "La llave primaria compuesta impide que un usuario marque dos veces el mismo comercio como favorito."
+        ],
+        q: "¿Por qué usar CASCADE en 'favorito_comercio'?",
+        a: "Porque los favoritos son preferencias auxiliares; si se elimina el usuario o el comercio, no tiene sentido conservar registros huérfanos."
+      },
+      {
+        num: 18, name: "favorito_producto", type: "assoc",
+        purpose: "Tabla asociativa N:M para la lista de deseos o productos guardados como favoritos por el usuario.",
+        keys: ["PK Compuesta: (usuario_id, producto_id)", "FK: usuario_id → usuario (CASCADE)", "FK: producto_id → producto (CASCADE)"],
+        constraints: [
+          "PK compuesta <code>(usuario_id, producto_id)</code> asegura unicidad sin columnas artificiales."
+        ],
+        q: "¿Por qué no se agregó un ID autoincremental en 'favorito_producto'?",
+        a: "Porque la combinación natural (usuario_id, producto_id) ya identifica de forma única cada registro y ninguna otra tabla necesita apuntar a un favorito."
+      },
+      {
+        num: 19, name: "item_carrito", type: "assoc",
+        purpose: "Carrito de compras persistente por usuario, apuntando directamente a la variante exacta del producto y la cantidad deseada.",
+        keys: ["PK Compuesta: (usuario_id, variante_id)", "FK: usuario_id → usuario (CASCADE)", "FK: variante_id → variante_producto (CASCADE)"],
+        constraints: [
+          "<code>ck_item_carrito_cantidad</code>: Exige <code>cantidad > 0</code> (si baja a 0, el ítem se elimina del carrito)."
+        ],
+        q: "¿Por qué 'item_carrito' apunta a 'variante_id' y no a 'producto_id'?",
+        a: "Porque el usuario compra una variante específica (ej. Camisa Talla M Azul) que es la que tiene precio y stock real."
+      }
+    ]
+  },
+  {
+    id: "mod-3",
+    title: "Módulo 3 · Cupones, Pedidos y Trazabilidad",
+    desc: "Promociones con reglas estrictas de coherencia, órdenes de compra, detalle con snapshot histórico y auditoría de estados.",
+    entities: [
+      {
+        num: 20, name: "cupon", type: "main",
+        purpose: "Define las campañas promocionales creadas por un comercio (descuento porcentual/fijo, envío gratis o producto de regalo).",
+        keys: ["PK: cupon_id", "FK: comercio_id → comercio", "FK: variante_regalo_id → variante_producto"],
+        constraints: [
+          "<code>ck_cupon_coherencia</code>: Valida 3 escenarios mutuamente excluyentes: descuentos exigen valor > 0 (y <= 100 si es %) sin regalo; envío gratis exige valor 0 sin regalo; recompensa por monto exige <code>variante_regalo_id</code> y <code>cantidad_regalo > 0</code>.",
+          "<code>ck_cupon_monto_minimo</code>: Obliga a definir <code>monto_minimo > 0</code> en promociones condicionadas por compra mínima.",
+          "<code>ck_cupon_vigencia</code>: Exige <code>fecha_fin > fecha_inicio</code>."
+        ],
+        q: "¿Cómo evita la base de datos que un cupón sea 'ENVIO_GRATIS' y al mismo tiempo tenga un porcentaje de descuento?",
+        a: "Con el constraint 'ck_cupon_coherencia', que amarra cada 'tipo_beneficio' con combinaciones exactas de 'tipo_valor', 'valor_descuento' y 'variante_regalo_id'."
+      },
+      {
+        num: 21, name: "pedido", type: "main",
+        purpose: "Núcleo transaccional de compra entre cliente y comercio, con cálculos financieros verificados, plazos de respuesta/pago y respaldo textual de dirección y datos bancarios.",
+        keys: ["PK: pedido_id", "FK: usuario_id → usuario", "FK: comercio_id → comercio", "FK: direccion_entrega_id → direccion"],
+        constraints: [
+          "<code>ck_pedido_total</code>: Valida la fórmula contable exacta: <code>total_pedido = subtotal_productos - descuento_aplicado + costo_envio</code>.",
+          "<code>ck_pedido_aceptado</code>: Impide avanzar a <code>ACEPTADO</code> o estados posteriores si faltan <code>costo_envio</code>, <code>total_pedido</code> o <code>fecha_limite_pago</code>.",
+          "<code>ck_pedido_domicilio</code> y <code>copia_direccion</code>: Si es <code>DOMICILIO</code> exige dirección y obliga a guardar una copia en texto (<code>direccion_entrega_texto</code>).",
+          "<code>ck_pedido_rechazo</code>: Si el estado es <code>RECHAZADO</code>, exige motivo obligatorio."
+        ],
+        q: "¿Por qué 'pedido' guarda 'direccion_entrega_texto' y 'datos_pago_texto' si ya tiene llaves foráneas?",
+        a: "Por inmutabilidad histórica (snapshot): si el cliente edita o borra su dirección meses después, o el comercio cambia su cuenta bancaria, el pedido histórico conserva los datos exactos vigentes al momento de la compra."
+      },
+      {
+        num: 22, name: "cupon_usuario", type: "assoc",
+        purpose: "Tabla asociativa N:M que controla la emisión, asignación y redención única de cupones personalizados por usuario.",
+        keys: ["PK Compuesta: (cupon_id, usuario_id)", "UQ: codigo_unico", "UQ: pedido_id", "FK: cupon_id, usuario_id, pedido_id"],
+        constraints: [
+          "<code>uq_cupon_usuario_pedido</code>: Garantiza que un mismo cupón emitido no se aplique a más de un pedido.",
+          "<code>ck_cupon_usuario_pedido</code>: Bicondicional que vincula los estados <code>APLICADO</code>/<code>USADO</code> con <code>pedido_id IS NOT NULL</code>.",
+          "<code>ck_cupon_usuario_uso</code>: Exige <code>fecha_uso</code> exactamente cuando el estado es <code>USADO</code>."
+        ],
+        q: "¿Cómo garantiza el modelo que un cupón único de usuario no se use dos veces?",
+        a: "Mediante la PK compuesta (cupon_id, usuario_id), la restricción UNIQUE sobre 'pedido_id' y el CHECK que amarra el estado 'USADO' con la fecha de uso y el pedido asociado."
+      },
+      {
+        num: 23, name: "detalle_pedido", type: "assoc",
+        purpose: "Líneas de productos dentro de cada pedido, diferenciando artículos comprados de artículos obsequiados por cupón.",
+        keys: ["PK Compuesta: (pedido_id, variante_id, es_regalo)", "FK: pedido_id, variante_id", "FK Compuesta: (regalo_cupon_id, regalo_usuario_id) → cupon_usuario"],
+        constraints: [
+          "<code>PK (pedido_id, variante_id, es_regalo)</code>: Permite que en un mismo pedido el cliente compre una variante y reciba otra unidad igual de regalo sin choque de llave primaria.",
+          "<code>ck_detalle_pedido_precio</code>: Si <code>es_regalo = TRUE</code>, obliga a que <code>precio_unitario = 0</code>.",
+          "<code>ck_detalle_pedido_regalo</code>: Exige trazabilidad completa al cupón de regalo cuando <code>es_regalo = TRUE</code>."
+        ],
+        q: "¿Por qué 'es_regalo' forma parte de la llave primaria de 'detalle_pedido'?",
+        a: "Porque si compras 1 hamburguesa ($20.000) y un cupón te regala otra hamburguesa igual ($0), ambas comparten pedido_id y variante_id; incluir 'es_regalo' permite registrarlas en filas separadas con precios distintos."
+      },
+      {
+        num: 24, name: "historial_estado_pedido", type: "main",
+        purpose: "Bitácora cronológica de cada transición de estado de un pedido, registrando quién ejecutó el cambio y cuándo ocurrió.",
+        keys: ["PK: historial_id", "FK: pedido_id → pedido", "FK: usuario_id → usuario (nullable para expiraciones automáticas)"],
+        constraints: [
+          "<code>ck_historial_estado_pedido_estados</code>: Valida estados permitidos y prohíbe registrar transiciones falsas donde <code>estado_anterior = estado_nuevo</code> (<code>IS DISTINCT FROM</code>)."
+        ],
+        q: "¿Por qué 'usuario_id' permite NULL en 'historial_estado_pedido'?",
+        a: "Porque algunos cambios de estado los ejecuta el sistema automáticamente por tiempo (ej. pasar de SOLICITADO a EXPIRADO cuando vence fecha_limite_respuesta) sin intervención humana."
+      }
+    ]
+  },
+  {
+    id: "mod-4",
+    title: "Módulo 4 · Módulo Financiero y Pagos",
+    desc: "Monetización de la plataforma mediante suscripciones de comercios (Wompi) y validación de comprobantes de pago de pedidos.",
+    entities: [
+      {
+        num: 25, name: "suscripcion", type: "main",
+        purpose: "Controla los periodos de suscripción (plan gratuito inicial o mensualidad pagada vía Wompi) que habilitan a un comercio a operar.",
+        keys: ["PK: suscripcion_id", "UQ: wompi_transaction_id", "UQ: (comercio_id, fecha_inicio)", "FK: comercio_id → comercio"],
+        constraints: [
+          "<code>ck_suscripcion_pagada</code>: Si el estado es <code>ACTIVA</code>, exige monto > 0, referencia de pago y fecha de pago.",
+          "<code>ck_suscripcion_gratis</code>: Si el estado es <code>GRATIS</code>, exige que monto, transacción Wompi y fecha de pago sean NULL.",
+          "<code>uq_suscripcion_periodo</code>: Evita dos suscripciones arrancando el mismo día para el mismo comercio."
+        ],
+        q: "¿Cómo diferencia el modelo una suscripción gratuita de prueba de una suscripción paga?",
+        a: "A través de dos CHECK complementarios ('ck_suscripcion_gratis' y 'ck_suscripcion_pagada') que exigen campos financieros nulos cuando es GRATIS y obligatorios cuando está ACTIVA."
+      },
+      {
+        num: 26, name: "comprobante_pago", type: "main",
+        purpose: "Registra los soportes de pago reportados por el cliente para un pedido (Nequi, Bre-B, transferencia o contra entrega) y su validación por el comercio.",
+        keys: ["PK: comprobante_pago_id", "FK: pedido_id → pedido"],
+        constraints: [
+          "<code>ck_comprobante_pago_soporte</code>: Si el método es electrónico (no <code>CONTRA_ENTREGA</code>), obliga a adjuntar referencia y URL del comprobante.",
+          "<code>ck_comprobante_pago_validacion</code>: <code>fecha_validacion</code> es NULL mientras esté en <code>REPORTADO</code> y obligatoria al pasar a <code>VALIDADO</code> o <code>RECHAZADO</code>.",
+          "<code>ck_comprobante_pago_rechazo</code>: Exige <code>motivo_rechazo</code> si el comprobante fue rechazado."
+        ],
+        q: "¿Por qué un pedido puede tener varios registros en 'comprobante_pago'?",
+        a: "Porque si el cliente sube una captura borrosa o un monto incompleto y el comercio lo rechaza (estado RECHAZADO con motivo), el cliente puede reportar un nuevo comprobante corregido para el mismo pedido."
+      }
+    ]
+  },
+  {
+    id: "mod-5",
+    title: "Módulo 5 · Soporte, Comunicación, Reputación y Auditoría",
+    desc: "Resolución de disputas, notificaciones multicanal, chat contextualizado, calificaciones bilaterales y parámetros globales.",
+    entities: [
+      {
+        num: 27, name: "reclamo_soporte", type: "main",
+        purpose: "Sistema unificado de tickets para reclamos sobre pedidos, PQRS generales y reportes de contenido inapropiado.",
+        keys: ["PK: reclamo_id", "FK: pedido_id → pedido", "FK: usuario_id → usuario"],
+        constraints: [
+          "<code>ck_reclamo_soporte_pedido</code>: Si <code>tipo_caso = 'RECLAMO_PEDIDO'</code>, exige <code>pedido_id IS NOT NULL</code>.",
+          "<code>ck_reclamo_soporte_contenido</code> y <code>objeto</code>: Si es <code>REPORTE_CONTENIDO</code>, exige indicar qué entidad se reporta (PRODUCTO, COMERCIO, CALIFICACION, MENSAJE o CHAT) y su ID.",
+          "<code>ck_reclamo_soporte_cierre</code>: Exige <code>fecha_cierre >= fecha_apertura</code> exactamente en estados finales (RESUELTO, RECHAZADO, CERRADO)."
+        ],
+        q: "¿Cómo maneja 'reclamo_soporte' tanto quejas de pedidos como reportes de mensajes ofensivos en una sola tabla?",
+        a: "Mediante un diseño polimórfico controlado: 'tipo_caso' define la naturaleza del ticket y los CHECK exigen 'pedido_id' cuando es reclamo de pedido, o el par (tipo_objeto, objeto_id) cuando es reporte de contenido."
+      },
+      {
+        num: 28, name: "notificacion", type: "main",
+        purpose: "Bandeja de alertas y notificaciones enviadas a usuarios por canal IN_APP, CORREO o PUSH, con enlace profundo (deep link) a la entidad origen.",
+        keys: ["PK: notificacion_id", "FK: usuario_id → usuario (ON DELETE CASCADE)"],
+        constraints: [
+          "<code>ck_notificacion_lectura</code>: Sincroniza el estado booleano lógico: <code>fecha_lectura</code> solo existe cuando <code>estado_lectura = 'LEIDA'</code>.",
+          "<code>ck_notificacion_referencia</code>: Exige que <code>referencia_entidad</code> y <code>referencia_id</code> vengan juntos o ambos sean NULL."
+        ],
+        q: "¿Para qué sirven 'referencia_entidad' y 'referencia_id' en 'notificacion'?",
+        a: "Permiten que al tocar la notificación en la app (ej. 'Tu pedido #45 fue aceptado'), el frontend sepa exactamente a qué pantalla y registro navegar."
+      },
+      {
+        num: 29, name: "chat", type: "main",
+        purpose: "Sala de conversación entre un usuario y un comercio, contextualizada opcionalmente a un pedido o a un reclamo de soporte.",
+        keys: ["PK: chat_id", "UQ NULLS NOT DISTINCT: (usuario_id, comercio_id, pedido_id, reclamo_id)", "FK: pedido_id, reclamo_id"],
+        constraints: [
+          "<code>uq_chat_contexto</code> con <code>NULLS NOT DISTINCT</code>: Evita que se creen múltiples chats generales duplicados cuando <code>pedido_id</code> y <code>reclamo_id</code> son NULL."
+        ],
+        q: "¿Por qué es crítico usar 'UNIQUE NULLS NOT DISTINCT' en la tabla 'chat'?",
+        a: "Porque en un chat previo a la compra tanto pedido_id como reclamo_id son NULL. Sin NULLS NOT DISTINCT, cada vez que el cliente abriera el chat con la tienda se crearía una sala nueva vacía."
+      },
+      {
+        num: 30, name: "mensaje", type: "main",
+        purpose: "Mensajes individuales dentro de cada sala de chat, soportando texto, imágenes, comprobantes y mensajes automáticos del sistema.",
+        keys: ["PK: mensaje_id", "FK: chat_id → chat", "FK: autor_usuario_id → usuario"],
+        constraints: [
+          "<code>ck_mensaje_adjunto</code>: Si el tipo es <code>IMAGEN</code> o <code>COMPROBANTE</code>, obliga a incluir <code>adjunto_url</code>.",
+          "<code>ck_mensaje_vacio</code>: Prohíbe enviar mensajes completamente vacíos (debe haber texto o archivo adjunto).",
+          "<code>ck_mensaje_lectura</code>: Garantiza que <code>fecha_lectura >= fecha_envio</code>."
+        ],
+        q: "¿Puede existir un mensaje con 'contenido' vacío en la base de datos?",
+        a: "Sí, siempre y cuando 'adjunto_url' NO sea nulo (por ejemplo, cuando el usuario envía solo una foto o un comprobante sin texto acompañante), tal como valida 'ck_mensaje_vacio'."
+      },
+      {
+        num: 31, name: "calificacion", type: "main",
+        purpose: "Evaluación bilateral post-pedido (1 a 5 estrellas): el cliente califica al comercio y el comercio puede calificar al cliente y responder reseñas.",
+        keys: ["PK: calificacion_id", "UQ: (pedido_id, calificador_usuario_id)", "FK: pedido_id, calificador_usuario_id, calificado_usuario_id, calificado_comercio_id"],
+        constraints: [
+          "<code>ck_calificacion_calificado</code>: Arco exclusivo (XOR): <code>(calificado_usuario_id IS NOT NULL)::INT + (calificado_comercio_id IS NOT NULL)::INT = 1</code>. Obliga a calificar a un usuario O a un comercio, nunca ambos ni ninguno.",
+          "<code>ck_calificacion_propia</code>: Impide que un usuario se auto-califique.",
+          "<code>ck_calificacion_respuesta</code>: Solo permite respuesta del comercio cuando el calificado fue un comercio."
+        ],
+        q: "¿Cómo implementa el script un arco exclusivo (XOR) en SQL para la tabla 'calificacion'?",
+        a: "Convirtiendo cada condición IS NOT NULL a entero (0 o 1) y exigiendo que su suma sea exactamente 1. Así garantiza que el destino sea exclusivamente un usuario o exclusivamente un comercio."
+      },
+      {
+        num: 32, name: "parametro_sistema", type: "main",
+        purpose: "Tabla de configuración dinámica clave-valor (ej. tiempo límite de pago, comisión, radio máximo) administrada por usuarios con rol ADMINISTRADOR.",
+        keys: ["PK: parametro_id", "UQ: clave", "FK Compuesta: (admin_usuario_id, admin_rol_id) → usuario_rol"],
+        constraints: [
+          "<code>ck_parametro_sistema_clave</code>: Exige formato snake_case en minúsculas.",
+          "<code>ck_parametro_sistema_valor</code>: Valida con expresiones regulares que el texto guardado corresponda al <code>tipo_dato</code> declarado (ENTERO, DECIMAL o BOOLEANO)."
+        ],
+        q: "¿Cómo evita 'parametro_sistema' que alguien guarde la palabra 'hola' en un parámetro de tipo ENTERO?",
+        a: "El CHECK 'ck_parametro_sistema_valor' inspecciona 'tipo_dato' y aplica una expresión regular (^-?[0-9]+$ para ENTERO, true/false para BOOLEANO) antes de permitir el guardado."
+      },
+      {
+        num: 33, name: "bitacora_auditoria", type: "main",
+        purpose: "Registro forense inmutable de todas las acciones administrativas críticas (suspensiones, cambios de parámetros, resoluciones) con IP de origen y valores antes/después.",
+        keys: ["PK: bitacora_id", "FK Compuesta: (admin_usuario_id, admin_rol_id) → usuario_rol"],
+        constraints: [
+          "<code>fk_bitacora_auditoria_admin</code>: Garantiza que solo un usuario con rol válido registrado en <code>usuario_rol</code> pueda quedar asentado como responsable.",
+          "Almacena <code>valor_anterior</code>, <code>valor_nuevo</code> e <code>ip_origen</code> (tipo INET) para trazabilidad total."
+        ],
+        q: "¿Por qué 'bitacora_auditoria' tiene una llave foránea compuesta hacia 'usuario_rol' en lugar de apuntar solo a 'usuario'?",
+        a: "Porque asegura a nivel de integridad referencial que la acción fue ejecutada bajo un rol administrativo asignado y no por un usuario común."
+      }
+    ]
+  }
+];
+
+const SIMPLE_QUERIES = [
+  {
+    num: "Q1",
+    level: "Básica · Filtro y Ordenamiento",
+    title: "Listar comercios activos que ofrecen domicilio en orden de mejor calificación",
+    goal: "Mostrar al cliente en la pantalla principal qué tiendas verificadas tienen domicilio disponible y cuáles tienen mejor puntuación.",
+    sql: `<span class="kw">SELECT</span> nombre_comercial, modalidad, radio_entrega_km, puntuacion_promedio
+<span class="kw">FROM</span> comercio
+<span class="kw">WHERE</span> estado = <span class="str">'ACTIVO'</span>
+  <span class="kw">AND</span> ofrece_domicilio = <span class="kw">TRUE</span>
+<span class="kw">ORDER BY</span> puntuacion_promedio <span class="kw">DESC</span>;`,
+    clauses: [
+      { tag: "SELECT", text: "Elige únicamente las 4 columnas que necesita mostrar la tarjeta de la tienda." },
+      { tag: "FROM", text: "Indica la tabla principal de donde salen los datos: <code>comercio</code>." },
+      { tag: "WHERE", text: "Filtra solo tiendas aprobadas (<code>estado = 'ACTIVO'</code>) y que además tengan domicilio habilitado." },
+      { tag: "ORDER BY ... DESC", text: "Ordena los resultados de mayor a menor puntuación (de 5.00 hacia abajo)." }
+    ],
+    flow: [
+      "1. PostgreSQL abre la tabla <strong>comercio</strong> (FROM).",
+      "2. Descarta los comercios pendientes/suspendidos y los que no hacen domicilios (WHERE).",
+      "3. Extrae solo las 4 columnas solicitadas (SELECT).",
+      "4. Ordena la lista final de mejor a peor calificación (ORDER BY)."
+    ],
+    headers: ["nombre_comercial", "modalidad", "radio_entrega_km", "puntuacion_promedio"],
+    rows: [
+      ["Panadería La Espiga", "LOCAL_FISICO", "5.00", "4.92"],
+      ["Postres Dulce Encanto", "EMPRENDEDOR", "8.50", "4.85"],
+      ["Fruver El Campo", "LOCAL_FISICO", "4.00", "4.60"]
+    ]
+  },
+  {
+    num: "Q2",
+    level: "Básica · JOIN de 2 Tablas",
+    title: "Consultar el catálogo activo de un comercio con su categoría",
+    goal: "Mostrar los productos publicados de la tienda 'Panadería La Espiga' junto con el nombre de su categoría.",
+    sql: `<span class="kw">SELECT</span> p.nombre <span class="kw">AS</span> producto, cp.nombre <span class="kw">AS</span> categoria, p.contador_vistas
+<span class="kw">FROM</span> producto p
+<span class="kw">JOIN</span> categoria_producto cp <span class="kw">ON</span> p.categoria_producto_id = cp.categoria_producto_id
+<span class="kw">WHERE</span> p.comercio_id = <span class="num">1</span>
+  <span class="kw">AND</span> p.estado = <span class="str">'ACTIVO'</span>;`,
+    clauses: [
+      { tag: "FROM producto p", text: "Toma la tabla <code>producto</code> y le asigna el alias corto <code>p</code>." },
+      { tag: "JOIN ... ON", text: "Une cada producto con su fila correspondiente en <code>categoria_producto</code> usando la llave foránea <code>categoria_producto_id</code>." },
+      { tag: "AS", text: "Renombra las columnas en el resultado para distinguir <code>producto</code> de <code>categoria</code>." },
+      { tag: "WHERE", text: "Filtra exclusivamente los productos activos del comercio con ID 1." }
+    ],
+    flow: [
+      "1. Toma las filas de <strong>producto</strong> (FROM).",
+      "2. Cruza cada fila con <strong>categoria_producto</strong> donde coincidan los IDs (JOIN ON).",
+      "3. Filtra por <code>comercio_id = 1</code> y <code>estado = 'ACTIVO'</code> (WHERE).",
+      "4. Proyecta las 3 columnas con sus alias (SELECT)."
+    ],
+    headers: ["producto", "categoria", "contador_vistas"],
+    rows: [
+      ["Pan de Bono Tradicional", "Panadería", "340"],
+      ["Torta de Chocolate Artesanal", "Repostería", "512"],
+      ["Croissant de Mantequilla", "Panadería", "198"]
+    ]
+  },
+  {
+    num: "Q3",
+    level: "Básica · Cálculo y Alerta de Inventario",
+    title: "Ver variantes disponibles y calcular el stock libre real para vender",
+    goal: "Restar el stock reservado en pedidos pendientes al stock disponible para saber cuántas unidades quedan realmente libres.",
+    sql: `<span class="kw">SELECT</span> sku, nombre_variante, precio,
+       (stock_disponible - stock_reservado) <span class="kw">AS</span> stock_libre
+<span class="kw">FROM</span> variante_producto
+<span class="kw">WHERE</span> estado = <span class="str">'ACTIVA'</span>
+  <span class="kw">AND</span> (stock_disponible - stock_reservado) > <span class="num">0</span>;`,
+    clauses: [
+      { tag: "Expresión aritmética", text: "<code>(stock_disponible - stock_reservado)</code> calcula en tiempo real las unidades que aún no están comprometidas." },
+      { tag: "WHERE", text: "Filtra variantes activas cuya resta sea mayor a 0 (es decir, que no estén agotadas)." }
+    ],
+    flow: [
+      "1. Lee los registros de <strong>variante_producto</strong> (FROM).",
+      "2. Verifica que estén activas y que tengan al menos 1 unidad libre tras restar reservas (WHERE).",
+      "3. Devuelve SKU, nombre, precio y el cálculo <code>stock_libre</code> (SELECT)."
+    ],
+    headers: ["sku", "nombre_variante", "precio", "stock_libre"],
+    rows: [
+      ["PAN-BONO-06", "Caja x 6 unidades", "12000.00", "14"],
+      ["TOR-CHOC-10", "Porción Personal", "8500.00", "5"]
+    ]
+  },
+  {
+    num: "Q4",
+    level: "Intermedia · JOIN de 3 Tablas",
+    title: "Ver el contenido actual del carrito de compras de un cliente",
+    goal: "Listar qué productos y variantes tiene guardados un usuario en su carrito y calcular el subtotal por cada línea.",
+    sql: `<span class="kw">SELECT</span> p.nombre, vp.nombre_variante, ic.cantidad, vp.precio,
+       (ic.cantidad * vp.precio) <span class="kw">AS</span> subtotal_linea
+<span class="kw">FROM</span> item_carrito ic
+<span class="kw">JOIN</span> variante_producto vp <span class="kw">ON</span> ic.variante_id = vp.variante_id
+<span class="kw">JOIN</span> producto p <span class="kw">ON</span> vp.producto_id = p.producto_id
+<span class="kw">WHERE</span> ic.usuario_id = <span class="num">10</span>;`,
+    clauses: [
+      { tag: "FROM item_carrito ic", text: "Parte de la tabla asociativa del carrito filtrada luego por el cliente 10." },
+      { tag: "Primer JOIN", text: "Conecta con <code>variante_producto</code> para obtener el precio y el nombre de la presentación." },
+      { tag: "Segundo JOIN", text: "Conecta la variante con <code>producto</code> para traer el nombre general del artículo." },
+      { tag: "ic.cantidad * vp.precio", text: "Multiplica cantidad por precio unitario para calcular el costo parcial de ese ítem." }
+    ],
+    flow: [
+      "1. Filtra los ítems del usuario 10 en <strong>item_carrito</strong>.",
+      "2. Busca precio y variante en <strong>variante_producto</strong> (JOIN 1).",
+      "3. Busca el nombre del producto padre en <strong>producto</strong> (JOIN 2).",
+      "4. Calcula el subtotal por fila y muestra el resumen del carrito (SELECT)."
+    ],
+    headers: ["nombre", "nombre_variante", "cantidad", "precio", "subtotal_linea"],
+    rows: [
+      ["Pan de Bono Tradicional", "Caja x 6 unidades", "2", "12000.00", "24000.00"],
+      ["Torta de Chocolate Artesanal", "Porción Personal", "1", "8500.00", "8500.00"]
+    ]
+  },
+  {
+    num: "Q5",
+    level: "Intermedia · Agregación (GROUP BY + COUNT + SUM)",
+    title: "Calcular el total de ventas completadas por cada comercio",
+    goal: "Obtener un reporte financiero sencillo que muestre cuántos pedidos completados tiene cada tienda y cuánto dinero sumaron.",
+    sql: `<span class="kw">SELECT</span> c.nombre_comercial,
+       <span class="fn">COUNT</span>(pe.pedido_id) <span class="kw">AS</span> pedidos_completados,
+       <span class="fn">SUM</span>(pe.total_pedido) <span class="kw">AS</span> ingresos_totales
+<span class="kw">FROM</span> comercio c
+<span class="kw">JOIN</span> pedido pe <span class="kw">ON</span> c.comercio_id = pe.comercio_id
+<span class="kw">WHERE</span> pe.estado_pedido = <span class="str">'COMPLETADO'</span>
+<span class="kw">GROUP BY</span> c.comercio_id, c.nombre_comercial
+<span class="kw">ORDER BY</span> ingresos_totales <span class="kw">DESC</span>;`,
+    clauses: [
+      { tag: "WHERE", text: "Incluye únicamente pedidos que finalizaron con éxito (<code>estado_pedido = 'COMPLETADO'</code>)." },
+      { tag: "GROUP BY", text: "Agrupa todos los pedidos que pertenecen a un mismo comercio para poder resumirlos." },
+      { tag: "COUNT() y SUM()", text: "Funciones de agregación: cuentan cuántos pedidos hay en cada grupo y suman sus totales." }
+    ],
+    flow: [
+      "1. Une <strong>comercio</strong> con <strong>pedido</strong> (FROM + JOIN).",
+      "2. Filtra solo los pedidos en estado <code>COMPLETADO</code> (WHERE).",
+      "3. Agrupa las filas por cada comercio (GROUP BY).",
+      "4. Cuenta pedidos y suma el dinero por grupo (SELECT).",
+      "5. Ordena de mayor a menor ingreso (ORDER BY)."
+    ],
+    headers: ["nombre_comercial", "pedidos_completados", "ingresos_totales"],
+    rows: [
+      ["Panadería La Espiga", "48", "1420000.00"],
+      ["Fruver El Campo", "31", "985000.00"],
+      ["Postres Dulce Encanto", "19", "610000.00"]
+    ]
+  },
+  {
+    num: "Q6",
+    level: "Intermedia · LEFT JOIN y Valores Nulos (IS NULL)",
+    title: "Detectar documentos cargados que aún están pendientes de revisión",
+    goal: "Aprovechar que 'documentacion' no tiene columna de estado: los pendientes son aquellos que aún no tienen fila en 'verificacion_documento'.",
+    sql: `<span class="kw">SELECT</span> d.documentacion_id, u.nombres, d.tipo_documento, d.fecha_carga
+<span class="kw">FROM</span> documentacion d
+<span class="kw">JOIN</span> usuario u <span class="kw">ON</span> d.usuario_id = u.usuario_id
+<span class="kw">LEFT JOIN</span> verificacion_documento vd <span class="kw">ON</span> d.documentacion_id = vd.documentacion_id
+<span class="kw">WHERE</span> vd.verificacion_doc_id <span class="kw">IS NULL</span>;`,
+    clauses: [
+      { tag: "LEFT JOIN", text: "Mantiene todos los documentos de la izquierda (<code>documentacion</code>) aunque todavía no tengan pareja en <code>verificacion_documento</code>." },
+      { tag: "WHERE ... IS NULL", text: "Se queda exclusivamente con los documentos cuya pareja a la derecha es <code>NULL</code> (es decir, nadie los ha revisado todavía)." }
+    ],
+    flow: [
+      "1. Cruza <strong>documentacion</strong> con <strong>usuario</strong> para saber quién subió el archivo.",
+      "2. Hace un <strong>LEFT JOIN</strong> contra <strong>verificacion_documento</strong>.",
+      "3. Filtra las filas donde <code>verificacion_doc_id IS NULL</code> (sin dictamen).",
+      "4. Muestra la cola de documentos pendientes por aprobar o rechazar."
+    ],
+    headers: ["documentacion_id", "nombres", "tipo_documento", "fecha_carga"],
+    rows: [
+      ["14", "Camila Andrea", "RUT", "2026-11-22 09:15:00-05"],
+      ["15", "Camila Andrea", "FACHADA", "2026-11-22 09:16:20-05"]
+    ]
+  },
+  {
+    num: "Q7",
+    level: "Intermedia · Trazabilidad de Pedido",
+    title: "Ver la línea de tiempo (auditoría de estados) de un pedido específico",
+    goal: "Reconstruir paso a paso por qué estados pasó el pedido #102 y en qué fecha ocurrió cada cambio.",
+    sql: `<span class="kw">SELECT</span> estado_anterior, estado_nuevo, observacion, fecha_cambio
+<span class="kw">FROM</span> historial_estado_pedido
+<span class="kw">WHERE</span> pedido_id = <span class="num">102</span>
+<span class="kw">ORDER BY</span> fecha_cambio <span class="kw">ASC</span>;`,
+    clauses: [
+      { tag: "WHERE pedido_id = 102", text: "Aísla todos los eventos registrados para el pedido número 102." },
+      { tag: "ORDER BY fecha_cambio ASC", text: "Ordena cronológicamente del evento más antiguo al más reciente." }
+    ],
+    flow: [
+      "1. Busca todas las filas del pedido 102 en <strong>historial_estado_pedido</strong>.",
+      "2. Ordena de forma ascendente por marca de tiempo (ASC).",
+      "3. Muestra la secuencia completa desde <code>NULL → SOLICITADO</code> hasta <code>ENTREGADO</code>."
+    ],
+    headers: ["estado_anterior", "estado_nuevo", "observacion", "fecha_cambio"],
+    rows: [
+      ["NULL", "SOLICITADO", "Pedido creado por el cliente", "2026-11-22 12:00:00-05"],
+      ["SOLICITADO", "ACEPTADO", "Comercio confirmó stock y envío", "2026-11-22 12:04:10-05"],
+      ["ACEPTADO", "PAGO_REPORTADO", "Cliente adjuntó soporte Nequi", "2026-11-22 12:07:45-05"],
+      ["PAGO_REPORTADO", "PAGO_CONFIRMADO", "Transferencia verificada", "2026-11-22 12:09:00-05"]
+    ]
+  },
+  {
+    num: "Q8",
+    level: "Básica · Seguridad y Roles",
+    title: "Listar los usuarios que tienen más de un rol asignado (HAVING)",
+    goal: "Identificar personas que actúan tanto como CLIENTE y como COMERCIANTE (o ADMINISTRADOR) dentro de MERCALIA.",
+    sql: `<span class="kw">SELECT</span> u.usuario_id, u.nombres, u.correo,
+       <span class="fn">COUNT</span>(ur.rol_id) <span class="kw">AS</span> cantidad_roles
+<span class="kw">FROM</span> usuario u
+<span class="kw">JOIN</span> usuario_rol ur <span class="kw">ON</span> u.usuario_id = ur.usuario_id
+<span class="kw">GROUP BY</span> u.usuario_id, u.nombres, u.correo
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(ur.rol_id) > <span class="num">1</span>;`,
+    clauses: [
+      { tag: "GROUP BY", text: "Agrupa las filas por cada usuario." },
+      { tag: "HAVING COUNT(...) > 1", text: "Filtra los grupos ya formados para mostrar solo usuarios que tengan 2 o más roles (a diferencia de WHERE, HAVING filtra sobre funciones agregadas)." }
+    ],
+    flow: [
+      "1. Une <strong>usuario</strong> con la tabla asociativa <strong>usuario_rol</strong>.",
+      "2. Agrupa por usuario (GROUP BY).",
+      "3. Cuenta cuántos roles tiene cada grupo y conserva solo los mayores a 1 (HAVING).",
+      "4. Muestra los usuarios multi-rol."
+    ],
+    headers: ["usuario_id", "nombres", "correo", "cantidad_roles"],
+    rows: [
+      ["4", "Carlos Eduardo", "carlos.tienda@correo.com", "2"],
+      ["7", "Laura Sofía", "laura.admin@mercalia.co", "3"]
+    ]
+  }
+];
+
+let masteredSet = new Set(JSON.parse(localStorage.getItem("mercalia_v2_mastered") || "[]"));
+let currentFilter = "all";
+
+function saveProgress() {
+  localStorage.setItem("mercalia_v2_mastered", JSON.stringify([...masteredSet]));
+  const total = 33;
+  const count = masteredSet.size;
+  const pct = Math.round((count / total) * 100);
+  document.getElementById("prog-text").textContent = `${count} / ${total} (${pct}%)`;
+  document.getElementById("mobile-prog").textContent = `${count}/${total}`;
+  document.getElementById("prog-bar").style.width = `${pct}%`;
+}
+
+function toggleMastered(num) {
+  if (masteredSet.has(num)) masteredSet.delete(num);
+  else masteredSet.add(num);
+  saveProgress();
+  renderModules();
+}
+
+function toggleAnswer(id, btn) {
+  const el = document.getElementById(id);
+  const open = el.classList.toggle("open");
+  btn.textContent = open ? "Ocultar respuesta" : "Ver respuesta modelo";
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+  renderModules();
+}
+
+function filterCards() {
+  renderModules();
+}
+
+function renderModules() {
+  const query = document.getElementById("searchInput").value.toLowerCase().trim();
+  const container = document.getElementById("modules-container");
+  container.innerHTML = "";
+
+  MODULES.forEach(mod => {
+    const filtered = mod.entities.filter(ent => {
+      const isMastered = masteredSet.has(ent.num);
+      if (currentFilter === "main" && ent.type !== "main") return false;
+      if (currentFilter === "assoc" && ent.type !== "assoc") return false;
+      if (currentFilter === "pending" && isMastered) return false;
+
+      if (!query) return true;
+      const haystack = [
+        ent.name, ent.purpose, ent.q, ent.a,
+        ...ent.keys, ...ent.constraints
+      ].join(" ").toLowerCase();
+      return haystack.includes(query);
+    });
+
+    if (filtered.length === 0) return;
+
+    const sec = document.createElement("section");
+    sec.id = mod.id;
+    sec.innerHTML = `
+      <div class="section-header">
+        <h2 class="section-title">${mod.title} <span class="nav-pill">${filtered.length}</span></h2>
+        <p class="section-desc">${mod.desc}</p>
+      </div>
+      <div class="cards-grid">
+        ${filtered.map(ent => {
+          const isMastered = masteredSet.has(ent.num);
+          const ansId = `ans-${ent.num}`;
+          return `
+            <article class="entity-card ${isMastered ? "mastered" : ""}">
+              <div class="card-top">
+                <div>
+                  <span class="entity-num">#${String(ent.num).padStart(2, "0")}</span>
+                  <div class="entity-name">${ent.name}</div>
+                </div>
+                <span class="entity-type ${ent.type === "assoc" ? "type-assoc" : "type-main"}">
+                  ${ent.type === "assoc" ? "Asociativa N:M" : "Principal"}
+                </span>
+              </div>
+
+              <p class="entity-purpose">${ent.purpose}</p>
+
+              <div class="keys-box">
+                ${ent.keys.map(k => {
+                  let cls = "key-uq";
+                  if (k.startsWith("PK")) cls = "key-pk";
+                  else if (k.startsWith("FK") || k.startsWith("INDEX")) cls = "key-fk";
+                  return `<span class="key-tag ${cls}">${k}</span>`;
+                }).join("")}
+              </div>
+
+              <div class="constraints-list">
+                <div class="constraints-title">Reglas &amp; Constraints Clave</div>
+                <ul>
+                  ${ent.constraints.map(c => `<li>${c}</li>`).join("")}
+                </ul>
+              </div>
+
+              <div class="qa-box">
+                <div class="qa-question">❓ ${ent.q}</div>
+                <div class="qa-actions">
+                  <button class="btn-reveal" onclick="toggleAnswer('${ansId}', this)">Ver respuesta modelo</button>
+                  <button class="btn-check ${isMastered ? "done" : ""}" onclick="toggleMastered(${ent.num})">
+                    ${isMastered ? "✓ Dominada" : "Marcar lista"}
+                  </button>
+                </div>
+                <div class="qa-answer" id="${ansId}">${ent.a}</div>
+              </div>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    `;
+    container.appendChild(sec);
+  });
+}
+
+function renderQueries() {
+  const container = document.getElementById("queries-container");
+  container.innerHTML = SIMPLE_QUERIES.map((q, idx) => `
+    <article class="sql-card">
+      <div class="sql-header">
+        <div>
+          <span class="sql-badge">${q.num} · ${q.level}</span>
+          <h3 class="sql-title">${q.title}</h3>
+        </div>
+      </div>
+      <p class="sql-goal">${q.goal}</p>
+
+      <div class="code-block-wrap">
+        <div class="code-topbar">
+          <span>PostgreSQL · Consulta DQL</span>
+          <button class="btn-copy" onclick="copySql(${idx}, this)">Copiar SQL</button>
+        </div>
+        <pre id="sql-code-${idx}">${q.sql}</pre>
+      </div>
+
+      <div class="breakdown-grid">
+        <div class="breakdown-panel">
+          <div class="panel-heading" style="color:var(--accent-cyan);">🧩 ¿Qué hace cada sentencia?</div>
+          ${q.clauses.map(c => `
+            <div class="clause-item">
+              <span class="clause-tag">${c.tag}</span>
+              <span>${c.text}</span>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="breakdown-panel">
+          <div class="panel-heading" style="color:var(--accent-indigo);">⚙️ Flujo de ejecución en PostgreSQL</div>
+          <div class="flow-steps">
+            ${q.flow.map((step, i) => `
+              <div class="flow-step">
+                <span class="step-num">${i + 1}</span>
+                <span>${step.replace(/^\d+\.\s*/, "")}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:0.76rem; font-weight:700; color:var(--accent-emerald); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.04em;">
+        📊 Resultado simulado con datos reales
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>${q.headers.map(h => `<th>${h}</th>`).join("")}</tr>
+          </thead>
+          <tbody>
+            ${q.rows.map(r => `<tr>${r.map(cell => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  `).join("");
+}
+
+function copySql(idx, btn) {
+  const text = document.getElementById(`sql-code-${idx}`).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = "¡Copiado!";
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+function closeSidebarMobile() {
+  if (window.innerWidth <= 960) {
+    document.getElementById("sidebar").classList.remove("open");
+  }
+}
+
+renderModules();
+renderQueries();
+saveProgress();
+</script>
+</body>
+</html>
